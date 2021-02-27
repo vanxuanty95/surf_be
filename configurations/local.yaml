@@ -1,0 +1,4 @@
+server:
+  binance:
+    websocket: "wss://stream.binance.com/ws"
+    limitRequest: 100
