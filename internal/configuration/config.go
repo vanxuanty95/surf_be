@@ -11,8 +11,13 @@ type Config struct {
 	Environment string
 	Server      struct {
 		Binance struct {
-			WebSocket    string `yaml:"websocket"`
-			LimitRequest int    `yaml:"limitRequest"`
+			WebSocket struct {
+				URL          string `yaml:"url"`
+				LimitRequest int    `yaml:"limitRequest"`
+			} `yaml:"websocket"`
+			Restful struct {
+				URL string `yaml:"url"`
+			} `yaml:"restful"`
 		} `yaml:"binance"`
 	} `yaml:"server"`
 }
