@@ -32,6 +32,7 @@ type (
 
 func (ws *BinanceWS) Init() {
 	ws.initConnection()
+	ws.initSubscribedMap()
 	go ws.pushMessageToChannel()
 }
 
@@ -40,9 +41,12 @@ func (ws *BinanceWS) initConnection() {
 	if err != nil {
 		panic(err)
 	}
+	ws.Connection = c
+}
+
+func (ws *BinanceWS) initSubscribedMap() {
 	ws.SubscribedMap = make(map[int]Subscribed, ws.Config.Server.Binance.WebSocket.LimitRequest)
 	ws.ClientResponse = make(chan []byte)
-	ws.Connection = c
 }
 
 func (ws *BinanceWS) pushMessageToChannel() {

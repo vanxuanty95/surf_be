@@ -1,43 +1,97 @@
 package bot
 
 import (
+	"fmt"
 	"log"
+	"math"
 	"strconv"
 	"surf_be/internal/app/mode"
 	"time"
 )
 
-func (bot *Bot) Start() {
-	bot.StartTime = time.Now()
-
-loop:
-	for {
-		select {
-
-		case <-time.After(bot.Duration):
-			break loop
-		case <-bot.StopChannel:
-			break loop
-		}
-	}
-}
-
-func (bot *Bot) startGetMessage() {
-
-}
-
-func (bot *Bot) inputMessageTo() {
-
-}
+const (
+	timeCalculateAveragePriceInSecond = 15.0
+)
 
 func (bot *Bot) HandleMessage(message mode.AggregateTrade) {
+	now := time.Unix(0, message.EventTime*int64(time.Millisecond))
+
 	currentPrice, err := strconv.ParseFloat(message.Price, 32)
 	if err != nil {
 		log.Printf("error parse float: %v", err)
 		return
 	}
 
-	if bot.CurrentPrice != 0 {
+	bot.sellorBuy(currentPrice)
+
+	differencePriceLatest := math.Abs(currentPrice - bot.PreviousPrice)
+	differenceTimeLatest := now.Sub(bot.LatestGetTime).Seconds()
+	bot.AveragePricePerSecond = bot.calculateAveragePricePerSecond(differencePriceLatest, differenceTimeLatest)
+	bot.PercentSell = math.Round(bot.AveragePricePerSecond/currentPrice*1000) / 1000 * 15
+
+	fmt.Print("\033[G\033[K")
+	fmt.Printf("current  price: %v\n", currentPrice)
+	fmt.Print("\033[G\033[K")
+	fmt.Printf("previous price: %v\n", bot.PreviousPrice)
+	fmt.Print("\033[G\033[K")
+	fmt.Printf("difference price: %v\n", differencePriceLatest)
+	fmt.Print("\033[G\033[K")
+	fmt.Printf("difference time: %v\n", differenceTimeLatest)
+	fmt.Print("\033[G\033[K")
+	fmt.Printf("price per second: %v\n", differencePriceLatest/differenceTimeLatest)
+	fmt.Print("\033[G\033[K")
+	fmt.Printf("average price per second: %v\n", bot.AveragePricePerSecond)
+	fmt.Print("\033[A")
+	fmt.Print("\033[A")
+	fmt.Print("\033[A")
+	fmt.Print("\033[A")
+	fmt.Print("\033[A")
+	fmt.Print("\033[A")
+
+	bot.PreviousPrice = currentPrice
+	bot.LatestGetTime = now
+}
+
+func (bot *Bot) calculateAveragePricePerSecond(differencePriceLatest float64, differenceTimeLatest float64) float64 {
+	if !bot.LatestGetTime.IsZero() || bot.PreviousPrice != 0 {
+
+		totalDifferenceTimeInSlice := 0.0
+		totalDifferencePriceInSlice := 0.0
+		for _, priceTime := range bot.AveragePricePerSecondSlice {
+			totalDifferenceTimeInSlice = totalDifferenceTimeInSlice + priceTime.differenceTime
+			totalDifferencePriceInSlice = totalDifferencePriceInSlice + priceTime.differencePrice
+		}
+
+		if differenceTimeLatest+totalDifferenceTimeInSlice > timeCalculateAveragePriceInSecond {
+			nextIndex := 0
+			totalDifferenceTimeInSliceToRemove := 0.0
+			for idx, priceTime := range bot.AveragePricePerSecondSlice {
+				totalDifferenceTimeInSliceToRemove := totalDifferenceTimeInSliceToRemove + priceTime.differenceTime
+				if totalDifferenceTimeInSliceToRemove >= differenceTimeLatest {
+					nextIndex = idx + 1
+					break
+				}
+			}
+
+			bot.AveragePricePerSecondSlice = bot.AveragePricePerSecondSlice[nextIndex:]
+
+			return (totalDifferencePriceInSlice + differencePriceLatest) / (totalDifferenceTimeInSlice + differenceTimeLatest)
+		} else {
+			if differencePriceLatest != 0 || differenceTimeLatest != 0 {
+				bot.AveragePricePerSecondSlice = append(bot.AveragePricePerSecondSlice,
+					PriceTime{
+						differencePrice: differencePriceLatest,
+						differenceTime:  differenceTimeLatest},
+				)
+			}
+		}
+
+	}
+	return bot.AveragePricePerSecond
+}
+
+func (bot *Bot) sellorBuy(currentPrice float64) {
+	if bot.CurrentPrice != 0 && bot.PercentSell != 0 {
 		sellPointPrice := bot.CurrentPrice + bot.CurrentPrice/100*bot.PercentSell
 		buyPointPrice := bot.CurrentPrice - bot.CurrentPrice/100*bot.PercentBuy
 
@@ -68,7 +122,7 @@ func (bot *Bot) HandleMessage(message mode.AggregateTrade) {
 			log.Printf("budget:      %v", bot.Budget)
 			log.Printf("================")
 		}
-	} else {
+	} else if bot.PercentSell != 0 {
 		buyPointPrice := bot.SellPrice - bot.SellPrice/100*bot.PercentBuy
 
 		if bot.Budget > 0 && (currentPrice <= buyPointPrice ||

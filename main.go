@@ -53,7 +53,6 @@ func main() {
 		StopChannel:   nil,
 		Type:          utils.AggTradeStreamType,
 		PercentBuy:    0.01,
-		PercentSell:   0.01,
 		Budget:        0,
 	}
 
