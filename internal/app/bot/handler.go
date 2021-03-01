@@ -22,7 +22,7 @@ func (bot *Bot) HandleMessage(message mode.AggregateTrade) {
 		return
 	}
 
-	bot.sellorBuy(currentPrice)
+	bot.sellOrBuy(currentPrice)
 
 	differencePriceLatest := math.Abs(currentPrice - bot.PreviousPrice)
 	differenceTimeLatest := now.Sub(bot.LatestGetTime).Seconds()
@@ -90,7 +90,7 @@ func (bot *Bot) calculateAveragePricePerSecond(differencePriceLatest float64, di
 	return bot.AveragePricePerSecond
 }
 
-func (bot *Bot) sellorBuy(currentPrice float64) {
+func (bot *Bot) sellOrBuy(currentPrice float64) {
 	if bot.CurrentPrice != 0 && bot.PercentSell != 0 {
 		sellPointPrice := bot.CurrentPrice + bot.CurrentPrice/100*bot.PercentSell
 		buyPointPrice := bot.CurrentPrice - bot.CurrentPrice/100*bot.PercentBuy
