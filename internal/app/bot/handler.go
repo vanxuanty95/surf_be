@@ -66,7 +66,7 @@ func (bot *Bot) calculateAveragePricePerSecond(differencePriceLatest float64, di
 			nextIndex := 0
 			totalDifferenceTimeInSliceToRemove := 0.0
 			for idx, priceTime := range bot.AveragePricePerSecondSlice {
-				totalDifferenceTimeInSliceToRemove := totalDifferenceTimeInSliceToRemove + priceTime.differenceTime
+				totalDifferenceTimeInSliceToRemove = totalDifferenceTimeInSliceToRemove + priceTime.differenceTime
 				if totalDifferenceTimeInSliceToRemove >= differenceTimeLatest {
 					nextIndex = idx + 1
 					break

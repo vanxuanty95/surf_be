@@ -88,17 +88,20 @@ func (ws *BinanceWS) countingTicker(ticker *time.Ticker) {
 
 func (ws *BinanceWS) Subscribe(pairsStr []string) int {
 	id := ws.generateSubscribeString(pairsStr)
-	if err := ws.Connection.WriteMessage(websocket.TextMessage, []byte(ws.SubscribedMap[id].Subscribe)); err != nil {
-		ws.Connection.Close()
-	}
+	ws.sentAMessage(ws.SubscribedMap[id].Subscribe)
 	return id
 }
 
 func (ws *BinanceWS) reSubscribe() {
 	for _, subscribed := range ws.SubscribedMap {
-		if err := ws.Connection.WriteMessage(websocket.TextMessage, []byte(subscribed.Subscribe)); err != nil {
-			ws.Connection.Close()
-		}
+		ws.sentAMessage(subscribed.Subscribe)
+	}
+}
+
+func (ws *BinanceWS) sentAMessage(message string) {
+	if err := ws.Connection.WriteMessage(websocket.TextMessage, []byte(message)); err != nil {
+		log.Printf("write/subcribe message err: %v", err)
+		ws.Connection.Close()
 	}
 }
 
@@ -127,8 +130,6 @@ func (ws *BinanceWS) generateID() int {
 }
 
 func (ws *BinanceWS) Unsubscribe(id int) {
-	if err := ws.Connection.WriteMessage(websocket.TextMessage, []byte(ws.SubscribedMap[id].Unsubscribe)); err != nil {
-		ws.Connection.Close()
-	}
+	ws.sentAMessage(ws.SubscribedMap[id].Unsubscribe)
 	delete(ws.SubscribedMap, id)
 }
