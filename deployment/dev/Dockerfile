@@ -7,4 +7,4 @@ COPY surf_be.bin .
 EXPOSE 8082
 
 # Run the binary program produced by `go install`
-CMD ["surf_be.bin"]
+CMD ["./surf_be.bin"]
