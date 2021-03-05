@@ -14,16 +14,16 @@ pipeline {
         }
         stage('docker build'){
             steps {
-                sh 'ssh vanxuanty95@hvanxuanty.ddns.net rm /home/vanxuanty95/Project/deploy/surf_be/bin/surf_be.bin'
-                sh 'ssh vanxuanty95@hvanxuanty.ddns.net rm /home/vanxuanty95/Project/deploy/surf_be/Dockerfile'
-                sh 'ssh vanxuanty95@hvanxuanty.ddns.net rm /home/vanxuanty95/Project/deploy/surf_be/docker-compose.yml'
+                sh 'ssh vanxuanty95@vanxuanty.ddns.net rm /home/vanxuanty95/Project/deploy/surf_be/bin/surf_be.bin'
+                sh 'ssh vanxuanty95@vanxuanty.ddns.net rm /home/vanxuanty95/Project/deploy/surf_be/Dockerfile'
+                sh 'ssh vanxuanty95@vanxuanty.ddns.net rm /home/vanxuanty95/Project/deploy/surf_be/docker-compose.yml'
 
-                sh 'scp -r surf_be.bin vanxuanty95@hvanxuanty.ddns.net:/home/vanxuanty95/Project/deploy/surf_be/bin/surf_be.bin'
-                sh 'scp -r deployment/dev/Dockerfile vanxuanty95@hvanxuanty.ddns.net:/home/vanxuanty95/Project/deploy/surf_be/Dockerfile'
-                sh 'scp -r deployment/dev/Dockerfile vanxuanty95@hvanxuanty.ddns.net:/home/vanxuanty95/Project/deploy/surf_be/docker-compose.yml'
+                sh 'scp -r surf_be.bin vanxuanty95@vanxuanty.ddns.net:/home/vanxuanty95/Project/deploy/surf_be/bin/surf_be.bin'
+                sh 'scp -r deployment/dev/Dockerfile vanxuanty95@vanxuanty.ddns.net:/home/vanxuanty95/Project/deploy/surf_be/Dockerfile'
+                sh 'scp -r deployment/dev/Dockerfile vanxuanty95@vanxuanty.ddns.net:/home/vanxuanty95/Project/deploy/surf_be/docker-compose.yml'
 
-                sh 'ssh vanxuanty95@hvanxuanty.ddns.net cd /home/vanxuanty95/Project/deploy/surf_be/'
-                sh 'ssh vanxuanty95@hvanxuanty.ddns.net docker-compose up -d'
+                sh 'ssh vanxuanty95@vanxuanty.ddns.net cd /home/vanxuanty95/Project/deploy/surf_be/'
+                sh 'ssh vanxuanty95@vanxuanty.ddns.net docker-compose up -d'
             }
         }
         stage('deploy'){
