@@ -11,11 +11,12 @@ pipeline {
             steps {
                 sh 'docker run -i --rm -v $PWD:/go/src/surf_be/ -w /go/src/surf_be golang:1.16-alpine go build -mod vendor -v -o surf_be.bin .'
                 sh 'cp deployment/dev/Jenkinsfile .'
+                sh 'cp deployment/dev/docker-compose.yml .'
             }
         }
         stage('docker build'){
             steps {
-                sh 'docker build'
+                sh 'docker build -t surf_be .'
             }
         }
         stage('deploy'){
