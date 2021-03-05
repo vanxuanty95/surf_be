@@ -17,6 +17,7 @@ pipeline {
         stage('docker build'){
             steps {
                 sh 'docker build -t surf_be .'
+                sh 'rm -f surf_be.bin'
             }
         }
         stage('deploy'){
