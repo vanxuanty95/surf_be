@@ -14,7 +14,7 @@ pipeline {
         }
         stage('docker build'){
             steps {
-                sh 'cd go/src/surf_be/deployment/dev'
+                sh 'cd deployment/dev'
                 sh 'docker.build("surf_be")'
             }
         }
