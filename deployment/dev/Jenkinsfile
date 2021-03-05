@@ -1,0 +1,10 @@
+node {
+  stage 'Checkout'
+  git url: 'https://github.com/vanxuanty95/surf_be.git'
+
+  stage 'build'
+  go build main.go
+
+  stage 'deploy'
+  sh './deploy.sh'
+}
