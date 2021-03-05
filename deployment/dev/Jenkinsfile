@@ -9,7 +9,7 @@ pipeline {
         }
         stage('go build'){
             steps {
-                sh 'docker run -i --rm -v $PWD:/go/src/surf_be/ -w /go/src/surf_be golang:1.16-alpine go build -mod vendor -v -o surf_be.bin .'
+                sh 'docker run -i --rm CGO_ENABLED=0 -v $PWD:/go/src/surf_be/ -w /go/src/surf_be golang:1.16-alpine go build -mod vendor -v -o surf_be.bin .'
                 sh 'cp deployment/dev/Dockerfile .'
                 sh 'cp deployment/dev/docker-compose.yml .'
             }
