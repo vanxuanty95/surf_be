@@ -6,6 +6,7 @@ node {
   sh 'docker run -i --rm -v $PWD:/go/src/surf_be/ -w /go/src/surf_be golang go build -mod vendor -v -o surf_be.bin .'
 
   stage 'docker build'
+  cd 'go/src/surf_be/deployment/dev'
   docker.build('surf_be')
 
   stage 'deploy'
