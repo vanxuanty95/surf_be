@@ -1,6 +1,6 @@
 version: '2'
 services:
-  mobycounter:
+  surf_be:
     container_name: surf_be
     image: surf_be
     ports:
