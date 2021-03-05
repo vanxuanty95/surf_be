@@ -14,12 +14,13 @@ pipeline {
         }
         stage('docker build'){
             steps {
+                sh 'ssh host.docker.internal ''docker cp 0bcda5f31e67:/var/jenkins_home/workspace/surf/surf_be/surf_be.bin /host/surf_be.bin'
                 sh 'docker build -f deployment/dev/Dockerfile .'
             }
         }
         stage('deploy'){
             steps{
-                sh './deployment/dev/deploy.sh'
+                sh 'ssh host.docker.internal'
             }
         }
     }
