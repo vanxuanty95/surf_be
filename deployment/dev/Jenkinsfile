@@ -25,4 +25,5 @@ pipeline {
                 sh './deployment/dev/deploy.sh'
             }
         }
+    }
 }
