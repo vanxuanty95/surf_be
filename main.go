@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"strconv"
 	"surf_be/internal/app/bot"
 	"surf_be/internal/app/utils"
@@ -10,6 +11,8 @@ import (
 	"surf_be/internal/resful_api"
 	"surf_be/internal/websocket"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 func main() {
@@ -21,10 +24,18 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	wsHandler := websocket.NewHandler(*cfg)
+
+	initRestfulService(*cfg)
+
+	stop := make(chan bool)
+	<-stop
+}
+
+func initBotService(config configuration.Config) {
+	wsHandler := websocket.NewHandler(config)
 	go wsHandler.DistributionMessage()
 
-	binanceRF := resful_api.NewBinanceRF(*cfg)
+	binanceRF := resful_api.NewBinanceRF(config)
 
 	access := "DOT"
 	excess := "USDT"
@@ -57,7 +68,17 @@ func main() {
 	}
 
 	wsHandler.PushBot(&BTCBot)
+}
 
-	stop := make(chan bool)
-	<-stop
+func initRestfulService(config configuration.Config) {
+	r := mux.NewRouter()
+	// Routes consist of a path and a handler function.
+	r.HandleFunc("/", YourHandler)
+
+	// Bind to a port and pass our router in
+	log.Fatal(http.ListenAndServe(":8082", r))
+}
+
+func YourHandler(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("Gorilla!\n"))
 }
