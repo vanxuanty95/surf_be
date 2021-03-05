@@ -14,7 +14,7 @@ pipeline {
         }
         stage('docker build'){
             steps {
-                sh 'docker build -f deployment/dev/Dockerfile.debug .'
+                sh 'docker build -f deployment/dev/Dockerfile .'
             }
         }
         stage('deploy'){
