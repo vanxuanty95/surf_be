@@ -1,14 +1,28 @@
-node {
-  stage 'checkout'
-  git url: 'https://github.com/vanxuanty95/surf_be.git'
+pipeline {
+    agent any
 
-  stage 'go build'
-  sh 'docker run -i --rm -v $PWD:/go/src/surf_be/ -w /go/src/surf_be golang go build -mod vendor -v -o surf_be.bin .'
-
-  stage 'docker build'
-  cd 'go/src/surf_be/deployment/dev'
-  docker.build('surf_be')
-
-  stage 'deploy'
-  sh './deployment/dev/deploy.sh'
+    stages {
+        stage('checkout'){
+            steps {
+                git url: 'https://github.com/vanxuanty95/surf_be.git'
+            }
+        }
+        stage('go build'){
+            steps {
+                sh 'docker run -i --rm -v $PWD:/go/src/surf_be/ -w /go/src/surf_be golang go build -mod vendor -v -o surf_be.bin .'
+            }
+        }
+        stage('docker build'){
+            steps {
+                sh 'cd go/src/surf_be/deployment/dev'
+            }
+            steps{
+                docker.build('surf_be')
+            }
+        }
+        stage('deploy'){
+            steps{
+                sh './deployment/dev/deploy.sh'
+            }
+        }
 }
