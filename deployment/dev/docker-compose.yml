@@ -1,0 +1,7 @@
+version: '2'
+services:
+  mobycounter:
+    container_name: surf_be
+    image: surf_be
+    ports:
+      - "8082:8082"

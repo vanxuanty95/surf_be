@@ -2,8 +2,11 @@ node {
   stage 'checkout'
   git url: 'https://github.com/vanxuanty95/surf_be.git'
 
-  stage 'build'
+  stage 'go build'
   sh 'docker run -i --rm -v $PWD:/go/src/surf_be/ -w /go/src/surf_be golang go build -mod vendor -v -o surf_be.bin .'
+
+  stage 'docker build'
+  docker.build('surf_be')
 
   stage 'deploy'
   sh './deployment/dev/deploy.sh'
