@@ -3,7 +3,7 @@ node {
   git url: 'https://github.com/vanxuanty95/surf_be.git'
 
   stage 'build'
-  sh 'go build main.go'
+  sh 'docker run -i --rm $PWD:/go/src/surf_be/ -w /go/src/surf_be golang'
 
   stage 'deploy'
   sh './deploy.sh'
