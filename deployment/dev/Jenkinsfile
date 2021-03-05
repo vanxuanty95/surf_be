@@ -9,21 +9,18 @@ pipeline {
         }
         stage('go build'){
             steps {
-                sh 'w'
                 sh 'docker run -i --rm -v $PWD:/go/src/surf_be/ -w /go/src/surf_be golang:1.16-alpine go build -mod vendor -v -o surf_be.bin .'
-                sh 'ls'
-                sh 'pwd'
                 sh 'cp deployment/dev/Jenkinsfile .'
             }
         }
         stage('docker build'){
             steps {
-                sh 'ssh -i deployment/sshkey.pub vanxuanty95@vanxuanty.ddns.net docker-compose up -d'
+                sh 'docker build'
             }
         }
         stage('deploy'){
             steps{
-                sh 'ssh host.docker.internal'
+                sh 'docker-compose up -d'
             }
         }
     }
