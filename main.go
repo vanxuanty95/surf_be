@@ -80,5 +80,5 @@ func initRestfulService(config configuration.Config) {
 }
 
 func YourHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Gorilla!\n"))
+	w.Write([]byte("Gorilla v2!\n"))
 }
