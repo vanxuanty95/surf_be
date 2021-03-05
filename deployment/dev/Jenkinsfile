@@ -10,20 +10,14 @@ pipeline {
         stage('go build'){
             steps {
                 sh 'docker run -i --rm -v $PWD:/go/src/surf_be/ -w /go/src/surf_be golang:1.16-alpine go build -mod vendor -v -o surf_be.bin .'
+                sh 'ls'
+                sh 'pwd'
+                sh 'cp deployment/dev/Jenkinsfile .'
             }
         }
         stage('docker build'){
             steps {
-                sh 'ssh -p "vanxuanty95@Vophuong1305@" ssh -o StrictHostKeyChecking=no vanxuanty95@vanxuanty.ddns.net rm /home/vanxuanty95/Project/deploy/surf_be/bin/surf_be.bin'
-                sh 'ssh -o StrictHostKeyChecking=no vanxuanty95@vanxuanty.ddns.net rm /home/vanxuanty95/Project/deploy/surf_be/Dockerfile'
-                sh 'ssh -o StrictHostKeyChecking=no vanxuanty95@vanxuanty.ddns.net rm /home/vanxuanty95/Project/deploy/surf_be/docker-compose.yml'
-
-                sh 'scp -o StrictHostKeyChecking=no -r surf_be.bin vanxuanty95@vanxuanty.ddns.net:/home/vanxuanty95/Project/deploy/surf_be/bin/surf_be.bin'
-                sh 'scp -o StrictHostKeyChecking=no -r deployment/dev/Dockerfile vanxuanty95@vanxuanty.ddns.net:/home/vanxuanty95/Project/deploy/surf_be/Dockerfile'
-                sh 'scp -o StrictHostKeyChecking=no -r deployment/dev/Dockerfile vanxuanty95@vanxuanty.ddns.net:/home/vanxuanty95/Project/deploy/surf_be/docker-compose.yml'
-
-                sh 'ssh -o StrictHostKeyChecking=no vanxuanty95@vanxuanty.ddns.net cd /home/vanxuanty95/Project/deploy/surf_be/'
-                sh 'ssh -o StrictHostKeyChecking=no vanxuanty95@vanxuanty.ddns.net docker-compose up -d'
+                sh 'ssh -i deployment/sshkey.pub vanxuanty95@vanxuanty.ddns.net docker-compose up -d'
             }
         }
         stage('deploy'){
