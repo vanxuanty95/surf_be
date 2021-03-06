@@ -26,7 +26,7 @@ func main() {
 	}
 
 	initRestfulService(*cfg)
-	initBotService(*cfg)
+	//initBotService(*cfg)
 
 	stop := make(chan bool)
 	<-stop
