@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-redis/redis/v8"
+	"log"
 	"surf_be/internal/configuration"
 	"time"
 )
@@ -26,7 +27,8 @@ func (rd *Redis) Init() {
 func (rd *Redis) Get(ctx context.Context, key string) (interface{}, error) {
 	val2, err := rd.Connection.Get(ctx, key).Result()
 	if err == redis.Nil {
-		return nil, errors.New("key does not exist")
+		log.Printf("key does not exist: %v", err)
+		return nil, nil
 	} else if err != nil {
 		return nil, err
 	}
@@ -41,6 +43,14 @@ func (rd *Redis) Set(ctx context.Context, key string, value interface{}, ttlInSe
 	}
 	if !ok {
 		return errors.New("redis value is existed")
+	}
+	return nil
+}
+
+func (rd *Redis) Delete(ctx context.Context, key string) error {
+	err := rd.Connection.Del(ctx, key).Err()
+	if err != nil {
+		return err
 	}
 	return nil
 }

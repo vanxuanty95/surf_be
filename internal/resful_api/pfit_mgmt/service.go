@@ -49,8 +49,21 @@ func (sv *Service) generateKeyInRedis(email string) string {
 }
 
 func (sv *Service) setToRedis(ctx context.Context, req LoginRequest) error {
-	if err := sv.RedisDB.Set(ctx, sv.generateKeyInRedis(req.Email), req, 300); err != nil {
+	value, err := sv.RedisDB.Get(ctx, sv.generateKeyInRedis(req.Email))
+	if err != nil {
 		return err
+	}
+	if value == nil {
+		if err := sv.RedisDB.Set(ctx, sv.generateKeyInRedis(req.Email), req, 300); err != nil {
+			return err
+		}
+	} else {
+		if err := sv.RedisDB.Delete(ctx, sv.generateKeyInRedis(req.Email)); err != nil {
+			return err
+		}
+		if err := sv.RedisDB.Set(ctx, sv.generateKeyInRedis(req.Email), req, 300); err != nil {
+			return err
+		}
 	}
 	return nil
 }
