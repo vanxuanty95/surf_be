@@ -29,6 +29,8 @@ type Bot struct {
 
 	AveragePricePerSecondSlice []PriceTime
 	AveragePricePerSecond      float64
+
+	CurrentData string
 }
 
 type PriceTime struct {

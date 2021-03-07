@@ -19,7 +19,7 @@ type Redis struct {
 func (rd *Redis) Init() {
 	rd.Connection = redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%v:%v", rd.Config.Server.DataBase.Redis.Host, rd.Config.Server.DataBase.Redis.Port),
-		Password: "",
+		Password: rd.Config.Server.DataBase.Redis.Password,
 		DB:       0,
 	})
 }

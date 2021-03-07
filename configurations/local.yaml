@@ -3,12 +3,13 @@ server:
     api_port: 8082
   binance:
     websocket:
-      ws_url: "wss://testnet.binance.vision/ws"
+      ws_url: "wss://stream.binance.com/ws"
       stream_url: "wss://testnet.binance.vision/stream"
       limitRequest: 100
     restful:
-      url: "https://testnet.binance.vision/api"
+      url: "https://testnet.binance.vision"
   database:
     redis:
       host: "vanxuanty.ddns.net"
       port: 6379
+      password: "Passw0rd998"

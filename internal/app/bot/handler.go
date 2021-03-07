@@ -48,6 +48,8 @@ func (bot *Bot) HandleMessage(message mode.AggregateTrade) {
 	fmt.Print("\033[A")
 	fmt.Print("\033[A")
 
+	bot.CurrentData = fmt.Sprintf("current_price: %v", currentPrice)
+
 	bot.PreviousPrice = currentPrice
 	bot.LatestGetTime = now
 }
@@ -139,4 +141,8 @@ func (bot *Bot) sellOrBuy(currentPrice float64) {
 			log.Printf("================")
 		}
 	}
+}
+
+func (bot *Bot) GetCurrentData() string {
+	return bot.CurrentData
 }

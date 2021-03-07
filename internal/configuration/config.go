@@ -25,8 +25,9 @@ type Config struct {
 		} `yaml:"binance"`
 		DataBase struct {
 			Redis struct {
-				Host string `yaml:"host"`
-				Port int    `yaml:"port"`
+				Host     string `yaml:"host"`
+				Port     int    `yaml:"port"`
+				Password string `yaml:"password"`
 			} `yaml:"redis"`
 		} `yaml:"database"`
 	} `yaml:"server"`
