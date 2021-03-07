@@ -1,0 +1,108 @@
+Index: main.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package main\n\nimport (\n\t\"fmt\"\n\t\"log\"\n\t\"strconv\"\n\t\"surf_be/internal/app/bot\"\n\t\"surf_be/internal/app/utils\"\n\t\"surf_be/internal/configuration\"\n\t\"surf_be/internal/resful_api\"\n\t\"surf_be/internal/websocket\"\n\t\"time\"\n)\n\nfunc main() {\n\tenv, cfgPath, err := configuration.ParseFlags()\n\tif err != nil {\n\t\tlog.Fatal(err)\n\t}\n\tcfg, err := configuration.NewConfig(env, cfgPath)\n\tif err != nil {\n\t\tlog.Fatal(err)\n\t}\n\twsHandler := websocket.NewHandler(*cfg)\n\tgo wsHandler.DistributionMessage()\n\n\tbinanceRF := resful_api.NewBinanceRF(*cfg)\n\n\taccess := \"DOT\"\n\texcess := \"USDT\"\n\tpair := fmt.Sprintf(\"%v%v\", access, excess)\n\n\trspData, err := binanceRF.GetAggTrades(pair, \"1\")\n\tif err != nil {\n\t\tlog.Fatal(err)\n\t}\n\n\tcurrentPrice, err := strconv.ParseFloat(rspData.Price, 32)\n\tif err != nil {\n\t\tlog.Fatalf(\"error parse float: %v\", err)\n\t}\n\n\tBTCBot := bot.Bot{\n\t\tID:            1,\n\t\tStartTime:     time.Now(),\n\t\tDuration:      2 * time.Hour,\n\t\tPair:          rspData.Symbol,\n\t\tAccess:        access,\n\t\tBuyInPrice:    currentPrice,\n\t\tBuyInQuantity: 1,\n\t\tCurrentPrice:  currentPrice,\n\t\tQuantity:      1,\n\t\tStopChannel:   nil,\n\t\tType:          utils.AggTradeStreamType,\n\t\tPercentBuy:    0.01,\n\t\tBudget:        0,\n\t}\n\n\twsHandler.PushBot(&BTCBot)\n\n\tstop := make(chan bool)\n\t<-stop\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/main.go b/main.go
+--- a/main.go	(revision 5562b9e33e53ab346f3141a2332c6f4c40b41b87)
++++ b/main.go	(date 1614794452164)
+@@ -4,6 +4,7 @@
+ 	"fmt"
+ 	"log"
+ 	"strconv"
++	"surf_be/internal/app/api"
+ 	"surf_be/internal/app/bot"
+ 	"surf_be/internal/app/utils"
+ 	"surf_be/internal/configuration"
+@@ -58,6 +59,8 @@
+ 
+ 	wsHandler.PushBot(&BTCBot)
+ 
++	api.StartServer()
++
+ 	stop := make(chan bool)
+ 	<-stop
+ }
+Index: go.sum
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>github.com/gorilla/websocket v1.4.2 h1:+/TMaTYc4QFitKJxsQ7Yye35DkWvkdLcvGKqM+x0Ufc=\ngithub.com/gorilla/websocket v1.4.2/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=\ngopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=\ngopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b h1:h8qDotaEPuJATrMmW04NCwg7v22aHH28wwpauUhK9Oo=\ngopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/go.sum b/go.sum
+--- a/go.sum	(revision 5562b9e33e53ab346f3141a2332c6f4c40b41b87)
++++ b/go.sum	(date 1614794399175)
+@@ -1,3 +1,5 @@
++github.com/gorilla/mux v1.8.0 h1:i40aqfkR1h2SlN9hojwV5ZA91wcXFOvkdNIeFDP5koI=
++github.com/gorilla/mux v1.8.0/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=
+ github.com/gorilla/websocket v1.4.2 h1:+/TMaTYc4QFitKJxsQ7Yye35DkWvkdLcvGKqM+x0Ufc=
+ github.com/gorilla/websocket v1.4.2/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
+ gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
+Index: go.mod
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>module surf_be\n\ngo 1.16\n\nrequire (\n\tgithub.com/gorilla/websocket v1.4.2\n\tgopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b\n)\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/go.mod b/go.mod
+--- a/go.mod	(revision 5562b9e33e53ab346f3141a2332c6f4c40b41b87)
++++ b/go.mod	(date 1614794399174)
+@@ -3,6 +3,7 @@
+ go 1.16
+ 
+ require (
++	github.com/gorilla/mux v1.8.0
+ 	github.com/gorilla/websocket v1.4.2
+ 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
+ )
+Index: internal/app/api/api.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/internal/app/api/api.go b/internal/app/api/api.go
+new file mode 100644
+--- /dev/null	(date 1614794452160)
++++ b/internal/app/api/api.go	(date 1614794452160)
+@@ -0,0 +1,20 @@
++package api
++
++import (
++	"fmt"
++	"github.com/gorilla/mux"
++	"log"
++	"net/http"
++)
++
++func StartServer() {
++	r := mux.NewRouter()
++	r.HandleFunc("/", Hello)
++	http.Handle("/", r)
++	fmt.Println("Starting up on 8080")
++	log.Fatal(http.ListenAndServe(":8080", nil))
++}
++
++func Hello(w http.ResponseWriter, req *http.Request) {
++	fmt.Fprintln(w, "Hello world!")
++}
+Index: vendor/modules.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+># github.com/gorilla/websocket v1.4.2\n## explicit\ngithub.com/gorilla/websocket\n# gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b\n## explicit\ngopkg.in/yaml.v3\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/vendor/modules.txt b/vendor/modules.txt
+--- a/vendor/modules.txt	(revision 5562b9e33e53ab346f3141a2332c6f4c40b41b87)
++++ b/vendor/modules.txt	(date 1614794399218)
+@@ -1,3 +1,6 @@
++# github.com/gorilla/mux v1.8.0
++## explicit
++github.com/gorilla/mux
+ # github.com/gorilla/websocket v1.4.2
+ ## explicit
+ github.com/gorilla/websocket
