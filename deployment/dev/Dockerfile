@@ -13,4 +13,4 @@ RUN echo $(ls -al ./configurations/)
 EXPOSE 8082
 
 # Run the binary program produced by `go install`
-CMD ["./surf_be.bin -env dev"]
+CMD ["./surf_be.bin", "-env", "dev"]
