@@ -39,15 +39,17 @@ func Authorize(redis redis.Redis) func(next http.Handler) http.Handler {
 				return
 			}
 
-			var redisValueMap map[string]interface{}
-			if err = json.Unmarshal([]byte(fmt.Sprintf("%v", redisValue)), &redisValueMap); err != nil {
-				WriteJSON(w)(HandleError(err, 9999))
-				return
-			}
+			if redisValue != nil {
+				var redisValueMap map[string]interface{}
+				if err = json.Unmarshal([]byte(fmt.Sprintf("%v", redisValue)), &redisValueMap); err != nil {
+					WriteJSON(w)(HandleError(err, 9999))
+					return
+				}
 
-			ctx = context.WithValue(ctx, ContextEmailKey, redisValueMap[ContextEmailKey])
-			ctx = context.WithValue(ctx, ContextAPIKey, redisValueMap[ContextAPIKey])
-			ctx = context.WithValue(ctx, ContextSecretKey, redisValueMap[ContextSecretKey])
+				ctx = context.WithValue(ctx, ContextEmailKey, redisValueMap[ContextEmailKey])
+				ctx = context.WithValue(ctx, ContextAPIKey, redisValueMap[ContextAPIKey])
+				ctx = context.WithValue(ctx, ContextSecretKey, redisValueMap[ContextSecretKey])
+			}
 
 			next.ServeHTTP(w, r.WithContext(ctx))
 		}
