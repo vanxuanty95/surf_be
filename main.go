@@ -8,11 +8,10 @@ import (
 	"surf_be/internal/app/bot"
 	"surf_be/internal/app/utils"
 	"surf_be/internal/configuration"
-	"surf_be/internal/resful_api"
-	"surf_be/internal/websocket"
+	binanceService "surf_be/internal/resful_api/binance"
+	"surf_be/internal/resful_api/pfit_mgmt"
+	binanceWS "surf_be/internal/websocket/binance"
 	"time"
-
-	"github.com/gorilla/mux"
 )
 
 func main() {
@@ -33,10 +32,10 @@ func main() {
 }
 
 func initBotService(config configuration.Config) {
-	wsHandler := websocket.NewHandler(config)
+	wsHandler := binanceWS.NewHandler(config)
 	go wsHandler.DistributionMessage()
 
-	binanceRF := resful_api.NewBinanceRF(config)
+	binanceRF := binanceService.NewService(config)
 
 	access := "DOT"
 	excess := "USDT"
@@ -72,14 +71,9 @@ func initBotService(config configuration.Config) {
 }
 
 func initRestfulService(config configuration.Config) {
-	r := mux.NewRouter()
-	// Routes consist of a path and a handler function.
-	r.HandleFunc("/", YourHandler)
-
-	// Bind to a port and pass our router in
-	log.Fatal(http.ListenAndServe(":8082", r))
-}
-
-func YourHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Gorilla v2!\n"))
+	router := pfit_mgmt.InitPfitMgmtRouter(config)
+	err := http.ListenAndServe(fmt.Sprintf(":%v", config.Server.PfitMgmt.APIPort), &router)
+	if err != nil {
+		log.Fatal(err)
+	}
 }

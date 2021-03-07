@@ -10,5 +10,4 @@ server:
       url: "https://testnet.binance.vision/api"
   database:
     redis:
-      host: "vanxuanty.ddns.net"
-      port: 6379
+      host: localhost

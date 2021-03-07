@@ -10,4 +10,4 @@ COPY configurations configurations
 EXPOSE 8082
 
 # Run the binary program produced by `go install`
-CMD ["./surf_be.bin"]
+CMD ["./surf_be.bin -env dev"]

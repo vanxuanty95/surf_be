@@ -5,7 +5,7 @@ import (
 	"log"
 	"math"
 	"strconv"
-	"surf_be/internal/app/mode"
+	"surf_be/internal/mode"
 	"time"
 )
 

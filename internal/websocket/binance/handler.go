@@ -1,4 +1,4 @@
-package websocket
+package binance
 
 import (
 	"encoding/json"
@@ -6,9 +6,9 @@ import (
 	"log"
 	"strings"
 	"surf_be/internal/app/bot"
-	"surf_be/internal/app/mode"
 	"surf_be/internal/app/utils"
 	"surf_be/internal/configuration"
+	"surf_be/internal/mode"
 )
 
 type HandlerImpl struct {

@@ -10,15 +10,25 @@ import (
 type Config struct {
 	Environment string
 	Server      struct {
+		PfitMgmt struct {
+			APIPort string `yaml:"api_port"`
+		} `yaml:"pfit_mgmt"`
 		Binance struct {
 			WebSocket struct {
-				URL          string `yaml:"url"`
+				WSURL        string `yaml:"ws_url"`
+				StreamURL    string `yaml:"stream_url"`
 				LimitRequest int    `yaml:"limitRequest"`
 			} `yaml:"websocket"`
 			Restful struct {
 				URL string `yaml:"url"`
 			} `yaml:"restful"`
 		} `yaml:"binance"`
+		DataBase struct {
+			Redis struct {
+				Host string `yaml:"host"`
+				Port int    `yaml:"port"`
+			} `yaml:"redis"`
+		} `yaml:"database"`
 	} `yaml:"server"`
 }
 

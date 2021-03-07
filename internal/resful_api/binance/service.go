@@ -1,4 +1,4 @@
-package resful_api
+package binance
 
 import (
 	"encoding/json"
@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"surf_be/internal/app/mode"
 	"surf_be/internal/app/utils"
 	"surf_be/internal/configuration"
+	"surf_be/internal/mode"
 )
 
 const (
@@ -16,18 +16,18 @@ const (
 )
 
 type (
-	BinanceRF struct {
+	Service struct {
 		Config configuration.Config
 	}
 )
 
-func NewBinanceRF(config configuration.Config) BinanceRF {
-	return BinanceRF{
+func NewService(config configuration.Config) Service {
+	return Service{
 		Config: config,
 	}
 }
 
-func (ws *BinanceRF) GetAggTrades(pair string, limit string) (*mode.AggregateTrade, error) {
+func (ws *Service) GetAggTrades(pair string, limit string) (*mode.AggregateTrade, error) {
 	if len(limit) == 0 {
 		limit = limitAggTrades
 	}

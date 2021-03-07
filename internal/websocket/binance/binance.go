@@ -1,4 +1,4 @@
-package websocket
+package binance
 
 import (
 	"encoding/json"
@@ -31,13 +31,13 @@ type (
 )
 
 func (ws *BinanceWS) Init() {
-	ws.initConnection()
+	ws.initWSConnection()
 	ws.initSubscribedMap()
 	go ws.pushMessageToChannel()
 }
 
-func (ws *BinanceWS) initConnection() {
-	c, _, err := websocket.DefaultDialer.Dial(ws.Config.Server.Binance.WebSocket.URL, nil)
+func (ws *BinanceWS) initWSConnection() {
+	c, _, err := websocket.DefaultDialer.Dial(ws.Config.Server.Binance.WebSocket.WSURL, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -66,7 +66,7 @@ loop:
 		if err != nil || err == io.EOF {
 			log.Printf("Error reading: %v", err)
 			log.Printf("re-init connection")
-			ws.initConnection()
+			ws.initWSConnection()
 			ws.reSubscribe()
 			goto loop
 		}
@@ -80,7 +80,7 @@ func (ws *BinanceWS) countingTicker(ticker *time.Ticker) {
 		case t := <-ticker.C:
 			log.Printf("cannot receive new message at: %v", t)
 			log.Printf("re-init connection")
-			ws.initConnection()
+			ws.initWSConnection()
 			ws.reSubscribe()
 		}
 	}

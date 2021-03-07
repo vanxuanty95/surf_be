@@ -1,0 +1,59 @@
+version: '1'
+services:
+  npm:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: npm
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    environment:
+      DB_MYSQL_HOST: "db"
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_USER: "npm"
+      DB_MYSQL_PASSWORD: "npm"
+      DB_MYSQL_NAME: "npm"
+    volumes:
+      - /docker/npm/data:/data
+      - /docker/npm/letsencrypt:/etc/letsencrypt
+  mariadb:
+    image: 'jc21/mariadb-aria:latest'
+    container_name: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: 'npm'
+      MYSQL_DATABASE: 'npm'
+      MYSQL_USER: 'npm'
+      MYSQL_PASSWORD: 'npm'
+    volumes:
+      - /docker/mysql:/var/lib/mysql
+  mongo:
+    image: mongo
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: P@ssw0rd
+    networks:
+      - bridge
+    volumes:
+      - /docker/mongodb/data/db:/data/db
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: true
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: P@ssw0rd
+      ME_CONFIG_MONGODB_SERVER: 172.17.0.1
+    networks:
+      - bridge
+  redis:
+    image: redis
+    container_name: redis
+    volumes:
+      - /docker/redis/data:/data
+    ports:
+    - 6379:6379
