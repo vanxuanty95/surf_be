@@ -3,7 +3,7 @@ FROM golang:1.16-alpine
 # We want to populate the module cache based on the go.{mod,sum} files.
 WORKDIR /home/
 COPY surf_be.bin .
-COPY configurations configurations
+COPY configurations/ configurations/
 
 
 # This container exposes port 8080 to the outside world
