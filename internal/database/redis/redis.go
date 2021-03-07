@@ -26,7 +26,7 @@ func (rd *Redis) Init() {
 func (rd *Redis) Get(ctx context.Context, key string) (interface{}, error) {
 	val2, err := rd.Connection.Get(ctx, key).Result()
 	if err == redis.Nil {
-		return nil, errors.New("key2 does not exist")
+		return nil, errors.New("key does not exist")
 	} else if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func (rd *Redis) Set(ctx context.Context, key string, value interface{}, ttlInSe
 		return err
 	}
 	if !ok {
-		return errors.New("set redis failed")
+		return errors.New("redis value is existed")
 	}
 	return nil
 }
