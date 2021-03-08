@@ -150,8 +150,8 @@ func (sv *Service) newBot(access, pair string) (*bot.Bot, error) {
 	return &TempBot, nil
 }
 
-func (sv *Service) GetGetBotStatus(ctx context.Context, req GetBotStatusRequest) (string, error) {
-	res := ""
+func (sv *Service) GetGetBotStatus(ctx context.Context, req GetBotStatusRequest) (GetBotStatusResponse, error) {
+	res := GetBotStatusResponse{}
 
 	if err := sv.validate(req); err != nil {
 		return res, err
@@ -172,7 +172,8 @@ func (sv *Service) GetGetBotStatus(ctx context.Context, req GetBotStatusRequest)
 
 	botRunning := sv.BinanceWSHL.GetBot(botDB.ID)
 
-	return botRunning.GetCurrentData(), nil
+	res.Bot = *botRunning
+	return res, nil
 }
 
 func (sv *Service) generateBotID() string {

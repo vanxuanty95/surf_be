@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"surf_be/internal/app/bot"
 )
 
 func WriteJSON(w http.ResponseWriter) func(resp interface{}, statusCode int) {
@@ -48,4 +49,8 @@ type LoginResponse struct {
 
 type StartBotResponse struct {
 	BotID string `json:"bot_id"`
+}
+
+type GetBotStatusResponse struct {
+	Bot bot.Bot `json:"bot"`
 }
