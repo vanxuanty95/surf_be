@@ -93,7 +93,9 @@ func (sv *Service) StartBot(ctx context.Context, req StartBotRequest) (StartBotR
 
 	email := ctx.Value(ContextEmailKey).(string)
 
-	botDB, err := sv.Repo.GetBotByEmailAndPair(ctx, email, req.Pair)
+	pair := fmt.Sprintf("%v%v", req.Access, req.Quote)
+
+	botDB, err := sv.Repo.GetBotByEmailAndPair(ctx, email, pair)
 	if err != nil {
 		return res, err
 	}
@@ -102,7 +104,7 @@ func (sv *Service) StartBot(ctx context.Context, req StartBotRequest) (StartBotR
 		return res, errors.New("bot is exited")
 	}
 
-	newBot, err := sv.newBot(req.Access, req.Pair)
+	newBot, err := sv.newBot(req.Access, pair)
 	if err != nil {
 		return res, err
 	}

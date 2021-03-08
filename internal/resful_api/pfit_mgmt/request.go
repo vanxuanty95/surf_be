@@ -25,5 +25,5 @@ type LoginRequest struct {
 
 type StartBotRequest struct {
 	Access string `json:"access" validate:"required"`
-	Pair   string `json:"pair" validate:"required"`
+	Quote  string `json:"quote" validate:"required"`
 }
