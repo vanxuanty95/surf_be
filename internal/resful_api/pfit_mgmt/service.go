@@ -16,6 +16,10 @@ import (
 	"time"
 )
 
+const (
+	LoginTTLDefaut = 10080
+)
+
 type (
 	Service struct {
 		Config      configuration.Config
@@ -70,14 +74,14 @@ func (sv *Service) setToRedis(ctx context.Context, req LoginRequest) error {
 		return err
 	}
 	if value == nil {
-		if err := sv.RedisDB.Set(ctx, sv.generateKeyInRedis(req.Email), req, 300); err != nil {
+		if err := sv.RedisDB.Set(ctx, sv.generateKeyInRedis(req.Email), req, LoginTTLDefaut); err != nil {
 			return err
 		}
 	} else {
 		if err := sv.RedisDB.Delete(ctx, sv.generateKeyInRedis(req.Email)); err != nil {
 			return err
 		}
-		if err := sv.RedisDB.Set(ctx, sv.generateKeyInRedis(req.Email), req, 300); err != nil {
+		if err := sv.RedisDB.Set(ctx, sv.generateKeyInRedis(req.Email), req, LoginTTLDefaut); err != nil {
 			return err
 		}
 	}
