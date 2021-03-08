@@ -45,3 +45,7 @@ type (
 type LoginResponse struct {
 	Email string `json:"email"`
 }
+
+type StartBotResponse struct {
+	BotID string `json:"bot_id"`
+}

@@ -14,7 +14,7 @@ import (
 type HandlerImpl struct {
 	Config    configuration.Config
 	BinanceWS BinanceWS
-	Bots      map[int]*bot.Bot
+	Bots      map[string]*bot.Bot
 }
 
 func NewHandler(cfg configuration.Config) HandlerImpl {
@@ -22,7 +22,7 @@ func NewHandler(cfg configuration.Config) HandlerImpl {
 	ws.Init()
 	return HandlerImpl{
 		BinanceWS: ws,
-		Bots:      make(map[int]*bot.Bot),
+		Bots:      make(map[string]*bot.Bot),
 	}
 }
 
@@ -31,7 +31,7 @@ func (hl *HandlerImpl) PushBot(b *bot.Bot) {
 	hl.Bots[b.ID] = b
 }
 
-func (hl *HandlerImpl) RemoveBot(id int) {
+func (hl *HandlerImpl) RemoveBot(id string) {
 	delete(hl.Bots, id)
 }
 

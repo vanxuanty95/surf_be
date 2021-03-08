@@ -3,6 +3,7 @@ package pfit_mgmt
 import (
 	"github.com/gorilla/mux"
 	"surf_be/internal/configuration"
+	"surf_be/internal/database/mongo"
 	"surf_be/internal/database/redis"
 	"surf_be/internal/resful_api/binance"
 	binanceWS "surf_be/internal/websocket/binance"
@@ -16,16 +17,20 @@ const (
 	PathToLogout    = "/logout"
 	PathToLogin     = "/login"
 	GetTransactions = "/transactions"
+	StartBot        = "/bot/start"
 	GetBotStatus    = "/bot/status/{pair}"
 )
 
 func InitPfitMgmtRouter(config configuration.Config, binanceHL *binanceWS.HandlerImpl, binanceSV *binance.Service) mux.Router {
 	redisDB := redis.Redis{Config: config}
 	redisDB.Init()
+	mongoDB := mongo.Mongo{Config: config}
+	mongoDB.Init()
 
 	InitValidationService()
 
-	service := NewService(config, redisDB, binanceSV, binanceHL)
+	repo := NewRepository(config, *mongoDB.Client)
+	service := NewService(config, redisDB, repo, binanceSV, binanceHL)
 	handler := NewHandler(config, service)
 
 	r := mux.NewRouter()
@@ -33,6 +38,7 @@ func InitPfitMgmtRouter(config configuration.Config, binanceHL *binanceWS.Handle
 
 	r.Path(PathToLogin).Methods(PostMethod).HandlerFunc(handler.Login)
 	r.Path(GetTransactions).Methods(PostMethod).HandlerFunc(handler.GetTransactions)
+	r.Path(StartBot).Methods(PostMethod).HandlerFunc(handler.StartBot)
 	r.Path(GetBotStatus).Methods(GetMethod).HandlerFunc(handler.GetBotStatus)
 
 	return *r

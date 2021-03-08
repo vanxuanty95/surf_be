@@ -49,6 +49,9 @@ func Authorize(redis redis.Redis) func(next http.Handler) http.Handler {
 				ctx = context.WithValue(ctx, ContextEmailKey, redisValueMap[ContextEmailKey])
 				ctx = context.WithValue(ctx, ContextAPIKey, redisValueMap[ContextAPIKey])
 				ctx = context.WithValue(ctx, ContextSecretKey, redisValueMap[ContextSecretKey])
+			} else {
+				WriteJSON(w)(HandleError(errors.New("please login"), 9999))
+				return
 			}
 
 			next.ServeHTTP(w, r.WithContext(ctx))

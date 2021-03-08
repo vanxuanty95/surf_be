@@ -2,8 +2,10 @@ package pfit_mgmt
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
+	"math/rand"
 	"strconv"
 	"surf_be/internal/app/bot"
 	"surf_be/internal/app/utils"
@@ -18,17 +20,18 @@ type (
 	Service struct {
 		Config      configuration.Config
 		RedisDB     redis.Redis
+		Repo        Repository
 		BinanceSv   *binance.Service
 		BinanceWSHL *binanceWS.HandlerImpl
-		IsStarted   bool
 		Bot         *bot.Bot
 	}
 )
 
-func NewService(config configuration.Config, redisDB redis.Redis, binanceSv *binance.Service, binanceWSHL *binanceWS.HandlerImpl) Service {
+func NewService(config configuration.Config, redisDB redis.Redis, repo Repository, binanceSv *binance.Service, binanceWSHL *binanceWS.HandlerImpl) Service {
 	return Service{
 		Config:      config,
 		RedisDB:     redisDB,
+		Repo:        repo,
 		BinanceSv:   binanceSv,
 		BinanceWSHL: binanceWSHL,
 	}
@@ -47,14 +50,10 @@ func (sv *Service) Login(ctx context.Context, req LoginRequest) (LoginResponse, 
 
 	res.Email = req.Email
 
-	if !sv.IsStarted {
-		sv.Bot = sv.startBot()
-		sv.IsStarted = true
-	}
 	return res, nil
 }
 
-func (sv *Service) validate(req LoginRequest) error {
+func (sv *Service) validate(req interface{}) error {
 	if err := ValidateStruct(req); err != nil {
 		return err
 	}
@@ -85,23 +84,49 @@ func (sv *Service) setToRedis(ctx context.Context, req LoginRequest) error {
 	return nil
 }
 
-func (sv *Service) startBot() *bot.Bot {
-	access := "BTC"
-	excess := "USDT"
-	pair := fmt.Sprintf("%v%v", access, excess)
+func (sv *Service) StartBot(ctx context.Context, req StartBotRequest) (StartBotResponse, error) {
+	res := StartBotResponse{}
 
+	if err := sv.validate(req); err != nil {
+		return res, err
+	}
+
+	email := ctx.Value(ContextEmailKey).(string)
+
+	botDB, err := sv.Repo.GetBotByEmailAndPair(ctx, email, req.Pair)
+	if err != nil {
+		return res, err
+	}
+
+	if botDB != nil {
+		return res, errors.New("bot is exited")
+	}
+
+	newBot, err := sv.newBot(req.Access, req.Pair)
+	if err != nil {
+		return res, err
+	}
+	newBot.Email = email
+	if err := sv.Repo.InsertBot(ctx, *newBot); err != nil {
+		return res, err
+	}
+	res.BotID = newBot.ID
+	return res, nil
+}
+
+func (sv *Service) newBot(access, pair string) (*bot.Bot, error) {
 	rspData, err := sv.BinanceSv.GetAggTrades(pair, "1")
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	currentPrice, err := strconv.ParseFloat(rspData.Price, 32)
 	if err != nil {
-		log.Fatalf("error parse float: %v", err)
+		return nil, err
 	}
 
-	BTCBot := bot.Bot{
-		ID:            1,
+	TempBot := bot.Bot{
+		ID:            sv.generateBotID(),
 		StartTime:     time.Now(),
 		Duration:      2 * time.Hour,
 		Pair:          rspData.Symbol,
@@ -116,10 +141,21 @@ func (sv *Service) startBot() *bot.Bot {
 		Budget:        0,
 	}
 
-	sv.BinanceWSHL.PushBot(&BTCBot)
-	return &BTCBot
+	sv.BinanceWSHL.PushBot(&TempBot)
+	return &TempBot, nil
 }
 
 func (sv *Service) GetGetBotStatus(ctx context.Context) (string, error) {
 	return sv.Bot.GetCurrentData(), nil
+}
+
+func (sv *Service) generateBotID() string {
+	b := make([]byte, 16)
+	_, err := rand.Read(b)
+	if err != nil {
+		log.Fatal(err)
+	}
+	uuid := fmt.Sprintf("%x-%x-%x-%x-%x",
+		b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
+	return uuid
 }

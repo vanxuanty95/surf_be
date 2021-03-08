@@ -29,6 +29,18 @@ type Config struct {
 				Port     int    `yaml:"port"`
 				Password string `yaml:"password"`
 			} `yaml:"redis"`
+			Mongo struct {
+				Host         []string `yaml:"host"`
+				Port         int      `yaml:"port"`
+				AuthDatabase string   `yaml:"auth_database"`
+				Username     string   `yaml:"username"`
+				Password     string   `yaml:"password"`
+				Database     string   `yaml:"database"`
+				Collection   struct {
+					Bot         string `yaml:"bot"`
+					Transaction string `yaml:"transaction"`
+				} `yaml:"collection"`
+			} `yaml:"mongo"`
 		} `yaml:"database"`
 	} `yaml:"server"`
 }

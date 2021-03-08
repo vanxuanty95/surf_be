@@ -78,10 +78,12 @@ func (ws *BinanceWS) countingTicker(ticker *time.Ticker) {
 	for {
 		select {
 		case t := <-ticker.C:
-			log.Printf("cannot receive new message at: %v", t)
-			log.Printf("re-init connection")
-			ws.initWSConnection()
-			ws.reSubscribe()
+			if len(ws.SubscribedMap) > 0 {
+				log.Printf("cannot receive new message at: %v", t)
+				log.Printf("re-init connection")
+				ws.initWSConnection()
+				ws.reSubscribe()
+			}
 		}
 	}
 }

@@ -22,3 +22,8 @@ type LoginRequest struct {
 	APIKey    string `json:"api_key" validate:"required"`
 	SecretKey string `json:"secret_key" validate:"required"`
 }
+
+type StartBotRequest struct {
+	Access string `json:"access" validate:"required"`
+	Pair   string `json:"pair" validate:"required"`
+}
