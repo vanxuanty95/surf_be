@@ -43,7 +43,7 @@ type (
 
 //======================================
 type LoginResponse struct {
-	Email string `json:"email"`
+	EmailWithEnv string `json:"email_with_env"`
 }
 
 type StartBotResponse struct {

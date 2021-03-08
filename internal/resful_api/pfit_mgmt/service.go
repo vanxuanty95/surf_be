@@ -48,7 +48,7 @@ func (sv *Service) Login(ctx context.Context, req LoginRequest) (LoginResponse, 
 		return res, err
 	}
 
-	res.Email = req.Email
+	res.EmailWithEnv = fmt.Sprintf("%v-%v", sv.Config.Environment, req.Email)
 
 	return res, nil
 }
