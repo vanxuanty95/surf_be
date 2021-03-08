@@ -35,6 +35,10 @@ func (hl *HandlerImpl) RemoveBot(id string) {
 	delete(hl.Bots, id)
 }
 
+func (hl *HandlerImpl) GetBot(id string) *bot.Bot {
+	return hl.Bots[id]
+}
+
 func (hl *HandlerImpl) DistributionMessage() {
 	for {
 		select {

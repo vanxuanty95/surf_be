@@ -1,8 +1,6 @@
 package pfit_mgmt
 
 import (
-	"fmt"
-	"github.com/gorilla/mux"
 	"net/http"
 	"surf_be/internal/configuration"
 )
@@ -63,10 +61,14 @@ func (hl *Handler) StartBot(w http.ResponseWriter, r *http.Request) {
 
 func (hl *Handler) GetBotStatus(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	pair := mux.Vars(r)["pair"]
-	fmt.Println(pair)
+	req := GetBotStatusRequest{}
 
-	res, err := hl.Service.GetGetBotStatus(ctx)
+	if err := DecodeBody(r, &req); err != nil {
+		WriteJSON(w)(HandleError(err, 9999))
+		return
+	}
+
+	res, err := hl.Service.GetGetBotStatus(ctx, req)
 	if err != nil {
 		WriteJSON(w)(HandleError(err, 9999))
 		return

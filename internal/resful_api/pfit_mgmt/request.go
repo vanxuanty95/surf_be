@@ -27,3 +27,8 @@ type StartBotRequest struct {
 	Access string `json:"access" validate:"required"`
 	Quote  string `json:"quote" validate:"required"`
 }
+
+type GetBotStatusRequest struct {
+	Access string `json:"access" validate:"required"`
+	Quote  string `json:"quote" validate:"required"`
+}

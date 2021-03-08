@@ -23,7 +23,7 @@ type (
 		Repo        Repository
 		BinanceSv   *binance.Service
 		BinanceWSHL *binanceWS.HandlerImpl
-		Bot         *bot.Bot
+		Bots        []string
 	}
 )
 
@@ -112,6 +112,9 @@ func (sv *Service) StartBot(ctx context.Context, req StartBotRequest) (StartBotR
 	if err := sv.Repo.InsertBot(ctx, *newBot); err != nil {
 		return res, err
 	}
+
+	sv.Bots = append(sv.Bots, newBot.ID)
+
 	res.BotID = newBot.ID
 	return res, nil
 }
@@ -147,8 +150,29 @@ func (sv *Service) newBot(access, pair string) (*bot.Bot, error) {
 	return &TempBot, nil
 }
 
-func (sv *Service) GetGetBotStatus(ctx context.Context) (string, error) {
-	return sv.Bot.GetCurrentData(), nil
+func (sv *Service) GetGetBotStatus(ctx context.Context, req GetBotStatusRequest) (string, error) {
+	res := ""
+
+	if err := sv.validate(req); err != nil {
+		return res, err
+	}
+
+	email := ctx.Value(ContextEmailKey).(string)
+
+	pair := fmt.Sprintf("%v%v", req.Access, req.Quote)
+
+	botDB, err := sv.Repo.GetBotByEmailAndPair(ctx, email, pair)
+	if err != nil {
+		return res, err
+	}
+
+	if botDB == nil {
+		return res, errors.New("bot is not existed")
+	}
+
+	botRunning := sv.BinanceWSHL.GetBot(botDB.ID)
+
+	return botRunning.GetCurrentData(), nil
 }
 
 func (sv *Service) generateBotID() string {

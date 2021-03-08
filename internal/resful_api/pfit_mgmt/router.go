@@ -18,7 +18,7 @@ const (
 	PathToLogin     = "/login"
 	GetTransactions = "/transactions"
 	StartBot        = "/bot/start"
-	GetBotStatus    = "/bot/status/{pair}"
+	GetBotStatus    = "/bot/status"
 )
 
 func InitPfitMgmtRouter(config configuration.Config, binanceHL *binanceWS.HandlerImpl, binanceSV *binance.Service) mux.Router {
@@ -39,7 +39,7 @@ func InitPfitMgmtRouter(config configuration.Config, binanceHL *binanceWS.Handle
 	r.Path(PathToLogin).Methods(PostMethod).HandlerFunc(handler.Login)
 	r.Path(GetTransactions).Methods(PostMethod).HandlerFunc(handler.GetTransactions)
 	r.Path(StartBot).Methods(PostMethod).HandlerFunc(handler.StartBot)
-	r.Path(GetBotStatus).Methods(GetMethod).HandlerFunc(handler.GetBotStatus)
+	r.Path(GetBotStatus).Methods(PostMethod).HandlerFunc(handler.GetBotStatus)
 
 	return *r
 }
