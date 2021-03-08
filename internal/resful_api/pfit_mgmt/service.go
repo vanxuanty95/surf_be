@@ -172,7 +172,7 @@ func (sv *Service) GetGetBotStatus(ctx context.Context, req GetBotStatusRequest)
 
 	botRunning := sv.BinanceWSHL.GetBot(botDB.ID)
 
-	res.Bot = *botRunning
+	res.CurrentPrice = botRunning.GetCurrentData()
 	return res, nil
 }
 
