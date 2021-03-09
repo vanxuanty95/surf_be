@@ -171,9 +171,11 @@ func (sv *Service) GetGetBotStatus(ctx context.Context, req GetBotStatusRequest)
 	}
 
 	if botDB == nil {
-		return res, errors.New("bot is not existed")
+		res.IsStarted = false
+		return res, nil
 	}
 
+	res.IsStarted = true
 	botRunning := sv.BinanceWSHL.GetBot(botDB.ID)
 
 	res.CurrentPrice = botRunning.GetCurrentData()
