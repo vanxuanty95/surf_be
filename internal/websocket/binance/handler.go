@@ -38,10 +38,11 @@ func (hl *HandlerImpl) PushBot(b *bot.Bot) {
 	hl.Bots[b.ID] = b
 }
 
-func (hl *HandlerImpl) RemoveBot(ctx context.Context, id string) {
+func (hl *HandlerImpl) RemoveBot(ctx context.Context, id string, idSubscribed int) {
 	if err := hl.Repo.DeleteBotByID(ctx, id); err != nil {
 		return
 	}
+	hl.BinanceWS.Unsubscribe(idSubscribed)
 	delete(hl.Bots, id)
 }
 
@@ -74,7 +75,7 @@ loop:
 
 func (hl *HandlerImpl) RemoveAllBot(ctx context.Context) {
 	for _, botRunning := range hl.Bots {
-		hl.RemoveBot(ctx, botRunning.ID)
+		hl.RemoveBot(ctx, botRunning.ID, botRunning.IDSubscribe)
 	}
 }
 

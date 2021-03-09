@@ -216,7 +216,7 @@ func (sv *Service) StopBot(ctx context.Context, req StopBotRequest) error {
 		return errors.New("more than 1 bot")
 	}
 
-	sv.BinanceWSHL.RemoveBot(ctx, botDB[0].ID)
+	sv.BinanceWSHL.RemoveBot(ctx, botDB[0].ID, botDB[0].IDSubscribe)
 
 	return nil
 }
