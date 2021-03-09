@@ -21,12 +21,7 @@ const (
 	GetBotStatus    = "/bot/status"
 )
 
-func InitPfitMgmtRouter(config configuration.Config, binanceHL *binanceWS.HandlerImpl, binanceSV *binance.Service) mux.Router {
-	redisDB := redis.Redis{Config: config}
-	redisDB.Init()
-	mongoDB := mongo.Mongo{Config: config}
-	mongoDB.Init()
-
+func InitPfitMgmtRouter(config configuration.Config, redisDB *redis.Redis, mongoDB *mongo.Mongo, binanceHL *binanceWS.HandlerImpl, binanceSV *binance.Service) mux.Router {
 	InitValidationService()
 
 	repo := NewRepository(config, *mongoDB.Client)

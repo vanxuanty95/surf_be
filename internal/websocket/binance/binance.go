@@ -1,6 +1,7 @@
 package binance
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
@@ -33,7 +34,10 @@ type (
 func (ws *BinanceWS) Init() {
 	ws.initWSConnection()
 	ws.initSubscribedMap()
-	go ws.pushMessageToChannel()
+}
+
+func (ws *BinanceWS) Start(ctxCancel context.Context) {
+	go ws.pushMessageToChannel(ctxCancel)
 }
 
 func (ws *BinanceWS) initWSConnection() {
@@ -49,14 +53,8 @@ func (ws *BinanceWS) initSubscribedMap() {
 	ws.ClientResponse = make(chan []byte)
 }
 
-func (ws *BinanceWS) pushMessageToChannel() {
-	defer func() {
-		err := ws.Connection.Close()
-		if err != nil {
-			log.Printf("error close websocket connection: %v", err)
-		}
-		close(ws.ClientResponse)
-	}()
+func (ws *BinanceWS) pushMessageToChannel(ctxCancel context.Context) {
+	defer ws.disconnect()
 	tickerGetMessageTimeout := time.NewTicker(durationDefaultWaitingMessageInSecond * time.Second)
 	go ws.countingTicker(tickerGetMessageTimeout)
 loop:
@@ -71,6 +69,9 @@ loop:
 			goto loop
 		}
 		ws.ClientResponse <- message
+		if ctxCancel.Err() != nil {
+			break
+		}
 	}
 }
 
@@ -134,4 +135,13 @@ func (ws *BinanceWS) generateID() int {
 func (ws *BinanceWS) Unsubscribe(id int) {
 	ws.sentAMessage(ws.SubscribedMap[id].Unsubscribe)
 	delete(ws.SubscribedMap, id)
+}
+
+func (ws *BinanceWS) disconnect() {
+	log.Println("stopping binance ws service")
+	err := ws.Connection.Close()
+	if err != nil {
+		log.Printf("error close websocket connection: %v", err)
+	}
+	close(ws.ClientResponse)
 }

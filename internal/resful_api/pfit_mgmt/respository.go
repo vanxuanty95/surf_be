@@ -39,7 +39,7 @@ func (rp *Repository) GetBotByEmailAndPair(ctx context.Context, email, pair stri
 func (rp *Repository) InsertBot(ctx context.Context, bot bot.Bot) error {
 	_, err := rp.Collection.InsertOne(ctx, bot)
 	if err != nil {
-		log.Printf("expect to insert accounting record to database, but got error: %v", err)
+		log.Printf("expect to insert bot to database, but got error: %v", err)
 		return err
 	}
 	return nil

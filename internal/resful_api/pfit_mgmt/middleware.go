@@ -16,7 +16,7 @@ const (
 	ContextSecretKey = "secret_key"
 )
 
-func Authorize(redis redis.Redis) func(next http.Handler) http.Handler {
+func Authorize(redis *redis.Redis) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			switch r.URL.Path {

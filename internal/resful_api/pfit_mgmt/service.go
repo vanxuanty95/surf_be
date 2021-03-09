@@ -23,7 +23,7 @@ const (
 type (
 	Service struct {
 		Config      configuration.Config
-		RedisDB     redis.Redis
+		RedisDB     *redis.Redis
 		Repo        Repository
 		BinanceSv   *binance.Service
 		BinanceWSHL *binanceWS.HandlerImpl
@@ -31,7 +31,7 @@ type (
 	}
 )
 
-func NewService(config configuration.Config, redisDB redis.Redis, repo Repository, binanceSv *binance.Service, binanceWSHL *binanceWS.HandlerImpl) Service {
+func NewService(config configuration.Config, redisDB *redis.Redis, repo Repository, binanceSv *binance.Service, binanceWSHL *binanceWS.HandlerImpl) Service {
 	return Service{
 		Config:      config,
 		RedisDB:     redisDB,

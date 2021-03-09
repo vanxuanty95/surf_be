@@ -18,9 +18,9 @@ server:
         - "vanxuanty.ddns.net"
       port: 27017
       auth_database: admin
-      username: "vanxuanty95"
-      password: "Vophuong1305"
-      database: "surf_be"
+      username: "admin"
+      password: "P@ssw0rd"
+      database: "local-surf-be"
       collection:
         bot: "bot"
         transaction: "transaction"
