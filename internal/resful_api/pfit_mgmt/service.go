@@ -27,7 +27,6 @@ type (
 		Repo        Repository
 		BinanceSv   *binance.Service
 		BinanceWSHL *binanceWS.HandlerImpl
-		Bots        []string
 	}
 )
 
@@ -117,8 +116,6 @@ func (sv *Service) StartBot(ctx context.Context, req StartBotRequest) (StartBotR
 		return res, err
 	}
 
-	sv.Bots = append(sv.Bots, newBot.ID)
-
 	res.BotID = newBot.ID
 	return res, nil
 }
@@ -175,9 +172,10 @@ func (sv *Service) GetGetBotStatus(ctx context.Context, req GetBotStatusRequest)
 		return res, nil
 	}
 
-	res.IsStarted = true
 	botRunning := sv.BinanceWSHL.GetBot(botDB.ID)
 
+	res.IsStarted = true
+	res.BotID = botRunning.ID
 	res.CurrentPrice = botRunning.GetCurrentData()
 	return res, nil
 }
@@ -191,4 +189,34 @@ func (sv *Service) generateBotID() string {
 	uuid := fmt.Sprintf("%x-%x-%x-%x-%x",
 		b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
 	return uuid
+}
+
+func (sv *Service) StopBot(ctx context.Context, req StopBotRequest) error {
+
+	if err := sv.validate(req); err != nil {
+		return err
+	}
+
+	fields := make(map[string]interface{})
+
+	for idx, field := range req.Fields {
+		fields[field] = req.Values[idx]
+	}
+
+	botDB, err := sv.Repo.GetBotDynamicFields(ctx, fields)
+	if err != nil {
+		return err
+	}
+
+	if botDB == nil || len(botDB) == 0 {
+		return errors.New("bot is not existed")
+	}
+
+	if len(botDB) > 1 {
+		return errors.New("more than 1 bot")
+	}
+
+	sv.BinanceWSHL.RemoveBot(ctx, botDB[0].ID)
+
+	return nil
 }

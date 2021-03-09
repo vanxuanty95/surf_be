@@ -44,3 +44,24 @@ func (rp *Repository) InsertBot(ctx context.Context, bot bot.Bot) error {
 	}
 	return nil
 }
+
+func (rp *Repository) GetBotDynamicFields(ctx context.Context, fields map[string]interface{}) ([]*bot.Bot, error) {
+	var botResult []*bot.Bot
+
+	filter := make(bson.M, 1)
+	for field, value := range fields {
+		filter[field] = value
+	}
+
+	cursor, err := rp.Collection.Find(ctx, filter)
+	if err != nil {
+		return botResult, err
+	}
+	defer cursor.Close(ctx)
+
+	if err := cursor.All(ctx, &botResult); err != nil {
+		return botResult, err
+	}
+
+	return botResult, nil
+}

@@ -19,6 +19,7 @@ const (
 	GetTransactions = "/transactions"
 	StartBot        = "/bot/start"
 	GetBotStatus    = "/bot/status"
+	StopBot         = "/bot/stop"
 )
 
 func InitPfitMgmtRouter(config configuration.Config, redisDB *redis.Redis, mongoDB *mongo.Mongo, binanceHL *binanceWS.HandlerImpl, binanceSV *binance.Service) mux.Router {
@@ -35,6 +36,7 @@ func InitPfitMgmtRouter(config configuration.Config, redisDB *redis.Redis, mongo
 	r.Path(GetTransactions).Methods(PostMethod).HandlerFunc(handler.GetTransactions)
 	r.Path(StartBot).Methods(PostMethod).HandlerFunc(handler.StartBot)
 	r.Path(GetBotStatus).Methods(PostMethod).HandlerFunc(handler.GetBotStatus)
+	r.Path(StopBot).Methods(PostMethod).HandlerFunc(handler.StopBot)
 
 	return *r
 }

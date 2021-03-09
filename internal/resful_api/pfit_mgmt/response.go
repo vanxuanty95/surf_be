@@ -52,5 +52,6 @@ type StartBotResponse struct {
 
 type GetBotStatusResponse struct {
 	IsStarted    bool   `json:"is_started"`
+	BotID        string `json:"bot_id"`
 	CurrentPrice string `json:"current_price"`
 }

@@ -76,3 +76,21 @@ func (hl *Handler) GetBotStatus(w http.ResponseWriter, r *http.Request) {
 
 	WriteJSON(w)(HandleSuccess(res))
 }
+
+func (hl *Handler) StopBot(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	req := StopBotRequest{}
+
+	if err := DecodeBody(r, &req); err != nil {
+		WriteJSON(w)(HandleError(err, 9999))
+		return
+	}
+
+	err := hl.Service.StopBot(ctx, req)
+	if err != nil {
+		WriteJSON(w)(HandleError(err, 9999))
+		return
+	}
+
+	WriteJSON(w)(HandleSuccess(nil))
+}
