@@ -20,7 +20,7 @@ server:
       auth_database: admin
       username: "admin"
       password: "P@ssw0rd"
-      database: "local-surf-be"
+      database: "dev-surf-be"
       collection:
         bot: "bot"
         transaction: "transaction"
