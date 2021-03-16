@@ -3,6 +3,7 @@ package binance
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -65,13 +66,17 @@ func (ws *Service) GetAggTrades(pair string, limit string) (*mode.AggregateTrade
 	return &aggregateTrades[0], nil
 }
 
-func (ws *Service) Oder(pair string, limit string) (*mode.AggregateTrade, error) {
-	if len(limit) == 0 {
-		limit = limitAggTrades
+func (ws *Service) Oder(pair, side, orderType, transactionID, signature string, quantity, price float64) (*mode.OrderResponse, error) {
+	var endpoint string
+
+	switch orderType {
+	case OrderTypeLimit:
+		endpoint = ws.buildLimitOrder(pair, side, transactionID, signature, quantity, price)
+	default:
+		return nil, errors.New("order type is not exist ")
 	}
 
-	endpoint := buildLimitOrder()
-	response, err := http.Get(buildLimitOrder)
+	response, err := http.Get(endpoint)
 	if err != nil {
 		log.Printf("The HTTP request failed with error %s\n", err)
 		return nil, err
@@ -86,30 +91,33 @@ func (ws *Service) Oder(pair string, limit string) (*mode.AggregateTrade, error)
 		return nil, errors.New(response.Status)
 	}
 
-	var aggregateTrades []mode.AggregateTrade
-	if err = json.NewDecoder(response.Body).Decode(&aggregateTrades); err != nil {
+	var errorRes mode.ErrorResponse
+	if err = json.NewDecoder(response.Body).Decode(&errorRes); err != nil {
 		return nil, err
 	}
 
-	if aggregateTrades == nil {
-		return nil, errors.New("response empty")
+	if errorRes.Code != 0 {
+		return nil, errors.New(errorRes.Message)
 	}
 
-	aggregateTrades[0].Symbol = pair
+	var res mode.OrderResponse
+	if err = json.NewDecoder(response.Body).Decode(&res); err != nil {
+		return nil, err
+	}
 
-	return &aggregateTrades[0], nil
+	return &res, nil
 }
 
-func (ws *Service) buildLimitOrder(symbol, side, orderType, timeInForce, quantity, price, transactionID, signature string) string {
+func (ws *Service) buildLimitOrder(symbol, side, transactionID, signature string, quantity, price float64) string {
 
-	params := strings.NewReplacer("{{timeInForce}}", timeInForce,
-		"{{quantity}}", quantity,
-		"{{price}}", price).Replace(LimitPrams)
+	params := strings.NewReplacer("{{timeInForce}}", TimeInForceGTC,
+		"{{quantity}}", fmt.Sprintf("%f", quantity),
+		"{{price}}", fmt.Sprintf("%f", price)).Replace(LimitPrams)
 
 	endpoint := strings.NewReplacer("{{host}}", ws.Config.Server.Binance.Restful.URL,
 		"{{symbol}}", symbol,
 		"{{side}}", side,
-		"{{type}}", orderType,
+		"{{type}}", OrderTypeLimit,
 		"{{params}}", params,
 		"{{transactionID}}", transactionID,
 		"{{timestamp}}", ws.generateTimestamp(),

@@ -111,6 +111,7 @@ func (bot *Bot) sellOrBuy(currentPrice float64) {
 			log.Printf("quantity:    %v", bot.Quantity)
 			log.Printf("budget:      %v", bot.Budget)
 			log.Printf("================")
+
 		}
 		if bot.Budget > 0 && currentPrice <= buyPointPrice {
 			quantityAdd := bot.Budget / currentPrice
