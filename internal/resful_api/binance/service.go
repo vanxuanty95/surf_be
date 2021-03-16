@@ -66,7 +66,7 @@ func (ws *Service) GetAggTrades(pair string, limit string) (*mode.AggregateTrade
 	return &aggregateTrades[0], nil
 }
 
-func (ws *Service) Oder(pair, side, orderType, transactionID, signature string, quantity, price float64) (*mode.OrderResponse, error) {
+func (ws *Service) Order(pair, side, orderType, transactionID, signature string, quantity, price float64) (*mode.OrderResponse, error) {
 	var endpoint string
 
 	switch orderType {
