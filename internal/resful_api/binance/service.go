@@ -65,7 +65,7 @@ func (ws *Service) GetAggTrades(pair string, limit string) (*mode.AggregateTrade
 	return &aggregateTrades[0], nil
 }
 
-func (ws *Service) Oder(pair string, limit string) (*mode.AggregateTrade, error) {
+func (ws *Service) Order(pair string, limit string) (*mode.AggregateTrade, error) {
 	if len(limit) == 0 {
 		limit = limitAggTrades
 	}
